@@ -1,10 +1,10 @@
-from .models import User
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status
 from .serializers import (
     AuthenticationSerializer,
-    RegisterSerializer
+    RegisterSerializer,
+    LoginSerializer
 )
 
 
@@ -46,3 +46,22 @@ class UserCreateViewSet(viewsets.GenericViewSet):
         return Response({
             "msg": "회원가입을 실패했습니다."
         }, status=status.HTTP_400_BAD_REQUEST)
+
+
+class UserLoginViewSet(viewsets.GenericViewSet):
+    """
+    로그인
+    식별 가능한 정보로 로그인 가능
+    email: test@ably.com 또는
+    user_name: test 또는
+    phone_number: 01012345678
+    """
+    def get_serializer_class(self):
+        return LoginSerializer
+
+    @action(detail=False, methods=["post"])
+    def login(self, request):
+        login_serializer = self.get_serializer(data=request.data, context={"request": request})
+
+        if login_serializer.is_valid(raise_exception=True):
+            return Response(login_serializer.validated_data, status=status.HTTP_200_OK)

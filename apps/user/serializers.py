@@ -1,5 +1,6 @@
 import os
 
+from django.contrib.auth import authenticate, login
 from .utils.utils import is_phone_number, password_validation_check
 from .models import User
 from random import randint
@@ -101,3 +102,24 @@ class RegisterSerializer(serializers.Serializer):
         )
 
         return user
+
+
+class LoginSerializer(serializers.ModelSerializer):
+    user_name = serializers.CharField(max_length=50, write_only=True)
+    password = serializers.CharField(write_only=True)
+
+    class Meta:
+        model = User
+        fields = ["user_name", "password"]
+
+    def validate(self, attrs):
+        user = authenticate(self.context.get("request"), username=attrs["user_name"], password=attrs["password"])
+
+        if user is None:
+            raise serializers.ValidationError(_("아이디 또는 비밀번호를 확인해주세요."))
+
+        login(self.context.get("request"), user)
+        data = {
+            "msg": f"{attrs['user_name']}님이 로그인하셨습니다."
+        }
+        return data
