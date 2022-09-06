@@ -1,11 +1,16 @@
+from .models import User
 from django.contrib.auth import logout
+from django.contrib.auth.mixins import LoginRequiredMixin
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework import viewsets, status
+from rest_framework import viewsets, status, mixins
 from .serializers import (
     AuthenticationSerializer,
     RegisterSerializer,
-    LoginSerializer
+    LoginSerializer,
+    UserLogoutSerializer,
+    UserDetailSerializer,
+
 )
 
 
@@ -53,9 +58,9 @@ class UserLoginViewSet(viewsets.GenericViewSet):
     """
     로그인
     식별 가능한 정보로 로그인 가능
-    email: test@ably.com 또는
-    user_name: test 또는
-    phone_number: 01012345678
+    다른 정보로 로그인하려면 로그아웃 필수
+    user_name - test@ably.com / test / 01012345678
+    password - test1234
     """
     def get_serializer_class(self):
         return LoginSerializer
@@ -71,10 +76,32 @@ class UserLoginViewSet(viewsets.GenericViewSet):
 class UserLogoutViewSet(viewsets.GenericViewSet):
     """
     로그아웃
+    Execute 버튼 누르면 로그아웃
     """
+    def get_serializer_class(self):
+        return UserLogoutSerializer
+
     @action(detail=False, methods=["get"])
     def logout(self, request):
         logout(request)
+
         return Response({
             "msg": "로그아웃했습니다."
         }, status=status.HTTP_200_OK)
+
+
+class UserDetailViewSet(LoginRequiredMixin,
+                        mixins.RetrieveModelMixin,
+                        viewsets.GenericViewSet):
+    """
+    내 정보 보기 기능
+    로그인 상태에서 요청해야함
+    sample data - id: 1 / email: test@ably.com / user_name: test / phone_number: 01012345678 / passowrd: test1234
+    """
+    lookup_url_kwarg = "user_id"
+
+    def get_queryset(self):
+        return User.objects.all()
+
+    def get_serializer_class(self):
+        return UserDetailSerializer

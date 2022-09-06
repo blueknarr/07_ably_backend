@@ -123,3 +123,21 @@ class LoginSerializer(serializers.ModelSerializer):
             "msg": f"{attrs['user_name']}님이 로그인하셨습니다."
         }
         return data
+
+
+class UserLogoutSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = ["user_name",]
+
+
+class UserDetailSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = [
+            "id",
+            "email",
+            "user_name",
+            "name",
+            "phone_number"
+        ]

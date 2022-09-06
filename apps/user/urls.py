@@ -3,7 +3,8 @@ from .views import (
     Authentication,
     UserCreateViewSet,
     UserLoginViewSet,
-    UserLogoutViewSet
+    UserLogoutViewSet,
+    UserDetailViewSet
 )
 
 phone_auth = Authentication.as_view({
@@ -22,9 +23,14 @@ logout = UserLogoutViewSet.as_view({
     "get": "logout"
 })
 
+user_detail = UserDetailViewSet.as_view({
+    "get": "retrieve"
+})
+
 urlpatterns = [
     path("auth/", phone_auth, name="phone_auth"),
     path("register/", register, name="register"),
     path("login/", login, name="login"),
     path("logout/", logout, name="login"),
+    path("user/<int:user_id>/", user_detail, name="user_detail"),
 ]
