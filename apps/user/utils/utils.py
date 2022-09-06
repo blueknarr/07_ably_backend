@@ -13,3 +13,17 @@ def is_phone_number(num):
     if validation:
         return True
     return False
+
+
+def password_validation_check(password):
+    """
+    비밀번호 정규표현식, 8자 이상 16자 이하, 소문자, 숫자 최소 하나 사용
+    :param password: String
+    :return: Boolean
+    """
+    password_regex = re.compile('^(?=.{8,16}$)(?=.*[a-z])(?=.*[0-9]).*$')
+    validation = password_regex.search(password)
+
+    if validation:
+        return True
+    return False
