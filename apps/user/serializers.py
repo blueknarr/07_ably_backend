@@ -125,7 +125,6 @@ class LoginSerializer(serializers.ModelSerializer):
         return data
 
 
-#class ChangePasswordSerializer(serializers.ModelSerializer):
 class ChangePasswordSerializer(serializers.Serializer):
     password = serializers.CharField(write_only=True)
     phone_number = serializers.CharField(max_length=11, write_only=True)
@@ -147,10 +146,6 @@ class ChangePasswordSerializer(serializers.Serializer):
         instance.save()
 
         return instance
-
-    # class Meta:
-    #     model = User
-    #     fields = ["password", "phone_number"]
 
 
 class UserLogoutSerializer(serializers.ModelSerializer):
