@@ -1,3 +1,4 @@
+from django.contrib.auth import logout
 from rest_framework.decorators import action
 from rest_framework.response import Response
 from rest_framework import viewsets, status
@@ -65,3 +66,15 @@ class UserLoginViewSet(viewsets.GenericViewSet):
 
         if login_serializer.is_valid(raise_exception=True):
             return Response(login_serializer.validated_data, status=status.HTTP_200_OK)
+
+
+class UserLogoutViewSet(viewsets.GenericViewSet):
+    """
+    로그아웃
+    """
+    @action(detail=False, methods=["get"])
+    def logout(self, request):
+        logout(request)
+        return Response({
+            "msg": "로그아웃했습니다."
+        }, status=status.HTTP_200_OK)
