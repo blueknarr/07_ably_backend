@@ -125,6 +125,34 @@ class LoginSerializer(serializers.ModelSerializer):
         return data
 
 
+#class ChangePasswordSerializer(serializers.ModelSerializer):
+class ChangePasswordSerializer(serializers.Serializer):
+    password = serializers.CharField(write_only=True)
+    phone_number = serializers.CharField(max_length=11, write_only=True)
+    my_auth_code = serializers.CharField(max_length=4, write_only=True)
+
+    def update(self, instance, validated_data):
+        auth_code = cache.get(validated_data["phone_number"])
+
+        if not auth_code:
+            raise serializers.ValidationError(_("전화번호 인증이 필수입니다."))
+
+        if auth_code != self.context.get("my_auth_code"):
+            raise serializers.ValidationError(_("인증 코드가 일치하지 않습니다."))
+
+        if not password_validation_check(validated_data["password"]):
+            raise serializers.ValidationError(_("8자리 이상 소문자, 숫자를 포함해 주세요."))
+
+        instance.set_password(validated_data["password"])
+        instance.save()
+
+        return instance
+
+    # class Meta:
+    #     model = User
+    #     fields = ["password", "phone_number"]
+
+
 class UserLogoutSerializer(serializers.ModelSerializer):
     class Meta:
         model = User

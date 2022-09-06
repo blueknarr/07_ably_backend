@@ -4,7 +4,8 @@ from .views import (
     UserCreateViewSet,
     UserLoginViewSet,
     UserLogoutViewSet,
-    UserDetailViewSet
+    UserDetailViewSet,
+    ChangePasswordViewSet
 )
 
 phone_auth = Authentication.as_view({
@@ -27,10 +28,15 @@ user_detail = UserDetailViewSet.as_view({
     "get": "retrieve"
 })
 
+change_password = ChangePasswordViewSet.as_view({
+    "patch": "password"
+})
+
 urlpatterns = [
     path("auth/", phone_auth, name="phone_auth"),
     path("register/", register, name="register"),
     path("login/", login, name="login"),
     path("logout/", logout, name="login"),
     path("user/<int:user_id>/", user_detail, name="user_detail"),
+    path("user/<int:user_id>/change-password/", change_password, name="change_password")
 ]
