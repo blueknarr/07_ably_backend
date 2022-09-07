@@ -1,0 +1,61 @@
+version: '3.8'
+
+services:
+  nginx:
+    container_name: nginx
+    build: ./nginx
+    ports:
+      - "80:80"
+    volumes:
+      - ./nginx/nginx.conf:/etc/nginx/nginx.conf
+      - ./apps/static:/app/static
+    depends_on:
+      - ably_app
+
+  mysql:
+    image: mysql:5.7
+    container_name: mysql
+
+    command:
+      - --character-set-server=utf8mb4
+      - --collation-server=utf8mb4_unicode_ci
+    environment:
+      MYSQL_DATABASE: ably
+      MYSQL_USER: django
+      MYSQL_PASSWORD: 1234
+      MYSQL_ROOT_PASSWORD: 1234
+    volumes:
+      - ./data:/docker-entrypoint-initdb.d
+    expose:
+      - "3306"
+
+  redis:
+    container_name: redis
+    image: redis
+    ports:
+      - "6379:6379"
+
+  ably_app:
+    container_name: ably_app
+    build:
+      context: .
+      dockerfile: ./apps/Dockerfile
+    command: >
+      bash -c "chmod +x ./wait-for-it.sh
+      && python manage.py makemigrations
+      && python manage.py migrate
+      && python manage.py collectstatic --no-input
+      && gunicorn config.wsgi:application --bind 0.0.0.0:8000"
+    expose:
+      - "8000"
+    depends_on:
+      - mysql
+    links:
+      - mysql:mysql
+    volumes:
+      - ./apps:/app
+      - ./apps/static:/app/static
+    env_file:
+      - ./apps/.env
+    restart: always
+    entrypoint: ./wait-for-it.sh mysql:3306 --
