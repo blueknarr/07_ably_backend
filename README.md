@@ -74,6 +74,19 @@
   - 비밀번호 변경 / error (인증 코드 없이 요청)
 
 <br>
+
+  ### 실행 방법
+
+```
+#AWS EC2 배포
+http://3.39.69.117/swagger/
+
+#로컬에서 실행하기
+cd ably_backend
+docker-compose up
+http://{ip-address}/swagger/
+```
+
 <br>
 
 ### 아키텍처 다이어그램
@@ -94,7 +107,11 @@
 <br>
 <br>
 
+## API
 
+API 사용법을 안내합니다.
+
+<br>
 
   ### API 명세서
 
@@ -108,13 +125,6 @@
 | POST   | /api/v1/user/<int: user_id>/change-password | 비밀 번호 변경      |
 
 <br>
-<br>
-
-## API
-
-API 사용법을 안내합니다.
-
-
 
 ### 전화번호 인증
 
